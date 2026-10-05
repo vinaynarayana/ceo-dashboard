@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_blank">
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEO Project Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f3f5f7; --surface:#ffffff; --surface-2:#eef1f4; --ink:#14212b; --ink-2:#4a5b69; --line:#d9e0e6;
+  --accent:#0d5c63; --accent-ink:#ffffff; --track:#e2e8ed; --focus:#0b6bcb;
+  --ok:#1b7a4b; --ok-bg:#e1f3ea; --warn:#8a5a00; --warn-bg:#fdf0d2; --bad:#b3261e; --bad-bg:#fbe4e2; --mute:#4a5b69; --mute-bg:#e6ebef;
+  --bar-ok:#2e9e68; --bar-warn:#d99a1c; --bar-bad:#d1453b; --bar-mute:#8798a6;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  color-scheme:dark;
+  --bg:#0e161c; --surface:#16212a; --surface-2:#1c2a35; --ink:#e8eef2; --ink-2:#9fb0bd; --line:#2a3946;
+  --accent:#5cc4cc; --accent-ink:#0e161c; --track:#2a3946; --focus:#6cb4ff;
+  --ok:#6fd6a0; --ok-bg:#143526; --warn:#f0c05a; --warn-bg:#3a2d0e; --bad:#ff8f86; --bad-bg:#421a17; --mute:#9fb0bd; --mute-bg:#243541;
+  --bar-ok:#3fb27a; --bar-warn:#e0a92e; --bar-bad:#e5645a; --bar-mute:#6b7f8f;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45;padding-inline:16px;padding-block:24px 48px}
+.wrap{max-width:1040px;margin-inline:auto;display:flex;flex-direction:column;gap:20px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px 24px}
+h1{font-size:clamp(1.6rem,4vw,2.1rem);font-weight:600;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:4px 20px;color:var(--ink-2);font-size:13px;align-items:center}
+.meta b{color:var(--ink);font-weight:500;font-family:var(--mono);font-size:12.5px}
+.banner{border-radius:6px;padding:10px 14px;font-size:14px;border:1px solid}
+.banner.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+.banner.bad{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:0}
+.summary div{background:var(--surface);padding:12px 16px}
+.summary dt{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.summary dd{margin:2px 0 0;font-family:var(--mono);font-size:1.9rem;font-weight:500;font-variant-numeric:tabular-nums}
+.summary dd.bad{color:var(--bad)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{font:inherit;font-size:13px;padding:7px 14px;border:0;background:transparent;color:var(--ink-2);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.tools{display:flex;gap:8px}
+.tools button{font:inherit;font-size:13px;padding:7px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);cursor:pointer}
+.tools button:disabled{opacity:.6;cursor:default}
+.products{display:flex;flex-direction:column;gap:10px}
+details.product{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+details.product>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:14px 16px}
+details.product>summary::-webkit-details-marker{display:none}
+.chev{width:10px;height:10px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);transform:rotate(-45deg);transition:transform .15s;justify-self:center}
+details[open]>summary .chev{transform:rotate(45deg)}
+.pname{font-weight:600;font-size:1.05rem}
+.psub{color:var(--ink-2);font-size:13px;display:flex;flex-wrap:wrap;gap:2px 10px;grid-column:2}
+.pright{display:flex;align-items:center;gap:12px;grid-column:3;grid-row:1/3}
+.pavg{font-family:var(--mono);font-size:1.15rem;font-variant-numeric:tabular-nums;min-width:3.6ch;text-align:right}
+.mini{width:88px;height:6px;background:var(--track);border-radius:3px;overflow:hidden}
+.mini i{display:block;height:100%;background:var(--accent)}
+@media (max-width:560px){.mini{display:none}}
+.projects{border-top:1px solid var(--line);margin:0;padding:0;list-style:none}
+.project{display:grid;grid-template-columns:minmax(0,1.5fr) 110px minmax(140px,1.1fr) 92px auto;gap:6px 16px;align-items:center;padding:12px 16px}
+.project+.project{border-top:1px solid var(--line)}
+.project .ptitle{font-weight:500;color:var(--ink);text-decoration:none}
+.project .ptitle:hover{text-decoration:underline;color:var(--accent)}
+.eta{font-size:13px;color:var(--ink-2);line-height:1.25}
+.eta b{display:block;color:var(--ink);font-weight:500;font-family:var(--mono);font-size:12.5px}
+.pct{display:flex;align-items:center;gap:10px}
+.bar{flex:1;height:10px;background:var(--track);border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:5px}
+.pct span{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13.5px;min-width:4ch;text-align:right}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;padding:3px 10px;border-radius:999px;white-space:nowrap;justify-self:start}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.s-ok{color:var(--ok);background:var(--ok-bg)} .s-warn{color:var(--warn);background:var(--warn-bg)} .s-bad{color:var(--bad);background:var(--bad-bg)} .s-mute{color:var(--mute);background:var(--mute-bg)}
+.pill.s-warn::before{border-radius:1px;transform:rotate(45deg)} .pill.s-bad::before{border-radius:0} .pill.s-mute::before{background:transparent;border:1.5px solid currentColor}
+.wbs{font-size:13px;white-space:nowrap}
+.sr{position:absolute;left:-9999px}
+@media (max-width:760px){
+  .project{grid-template-columns:1fr auto;grid-template-areas:"t s" "p p" "e w"}
+  .project .ptitle{grid-area:t} .project .pill{grid-area:s;justify-self:end} .project .pct{grid-area:p} .project .eta{grid-area:e} .project .wbs{grid-area:w;justify-self:end}
+}
+.admin{background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:13px}
+.admin>summary{cursor:pointer;padding:12px 16px;font-weight:500;color:var(--ink-2)}
+.admin .body{padding:0 16px 16px;display:grid;gap:14px;color:var(--ink-2)}
+.admin h3{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.admin ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.rnote{align-self:center;font-size:12.5px;color:var(--ink-2)}
+.hint{margin:0;font-size:13px;color:var(--ink-2)}
+.empty{padding:32px 16px;text-align:center;color:var(--ink-2)}
+@media (prefers-reduced-motion:reduce){.chev{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>CEO Project Dashboard</h1>
+    <div class="meta" aria-label="Report timing">
+      <span>Report date <b id="rdate">…</b></span>
+      <span>Source refreshed <b id="rrefresh">…</b></span>
+    </div>
+  </header>
+  <div id="banners" role="status" aria-live="polite"></div>
+  <dl class="summary" id="summary" aria-label="Portfolio summary"></dl>
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Filter projects">
+      <button type="button" data-f="all" aria-pressed="true">All projects</button>
+      <button type="button" data-f="attn" aria-pressed="false">Needs attention</button>
+    </div>
+    <div class="tools"><span class="rnote" id="rnote" role="status" aria-live="polite"></span><button type="button" id="refresh">Refresh now</button><button type="button" id="toggleAll">Expand all</button></div>
+  </div>
+  <p class="hint" id="hint" hidden>Showing projects that are Overdue, At Risk, have No ETA, or have No Data. Projects that are On Track are hidden.</p>
+  <div class="products" id="products"><div class="empty">Loading live data…</div></div>
+  <details class="admin">
+    <summary>Data quality &amp; admin notes (internal)</summary>
+    <div class="body" id="adminBody"></div>
+  </details>
+</div>
+
+<script>
+var V = null, filter = 'all', firstRender = true;
+var CLS = {'On Track':'s-ok','At Risk':'s-warn','Overdue':'s-bad','No ETA':'s-mute','No Data':'s-mute'};
+var BAR = {'On Track':'var(--bar-ok)','At Risk':'var(--bar-warn)','Overdue':'var(--bar-bad)','No ETA':'var(--bar-mute)','No Data':'var(--bar-mute)'};
+var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function fmtISO(s){var p=s.split('-');return p[2]+' '+MON[+p[1]-1]+' '+p[0];}
+function fmtTime(iso){var d=new Date(iso);return d.getDate()+' '+MON[d.getMonth()]+' '+d.getFullYear()+', '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+function ago(h){return h<1?Math.max(1,Math.round(h*60))+' min ago':h<48?Math.round(h)+' h ago':Math.round(h/24)+' days ago';}
+function needs(p){return p.status!=='On Track';}
+
+function projectRow(p){
+  var w=p.pct===null?0:Math.round(p.pct);
+  var etaB=p.complete?'Completed':(p.eta?fmtISO(p.eta):'Unavailable');
+  var rel='ETA';
+  if(p.eta&&p.daysToEta!==null){var n=p.daysToEta;rel=n<0?(-n)+' day'+(n===-1?'':'s')+' late':n===0?'due today':'in '+n+' day'+(n===1?'':'s');}
+  if(p.status==='No ETA')rel='no planned end dates';
+  if(p.status==='No Data')rel='no countable tasks';
+  return '<li class="project">'+
+    '<a class="ptitle" href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.name)+'<span class="sr"> (opens WBS in Google Sheets)</span></a>'+
+    '<div class="eta"><b>'+etaB+'</b>'+rel+'</div>'+
+    '<div class="pct"><div class="bar" role="progressbar" aria-label="'+esc(p.name)+' completion" aria-valuemin="0" aria-valuemax="100" '+(p.pct===null?'aria-valuetext="Unavailable"':'aria-valuenow="'+w+'"')+'><i style="width:'+w+'%;background:'+BAR[p.status]+'"></i></div><span>'+(p.pct===null?'Unavailable':Math.round(p.pct)+'%')+'</span></div>'+
+    '<span class="pill '+CLS[p.status]+'">'+p.status+'</span>'+
+    '<a class="wbs" href="'+esc(p.url)+'" target="_blank" rel="noopener" aria-label="View WBS for '+esc(p.name)+'">View WBS ↗</a></li>';
+}
+
+function render(){
+  document.getElementById('rdate').textContent=fmtISO(V.today);
+  document.getElementById('rrefresh').textContent=fmtTime(V.generatedAt)+' ('+ago(V.ageHours)+')';
+  var b='';
+  if(V.stale)b+='<div class="banner warn"><strong>Data may be out of date.</strong> Last successful refresh was '+ago(V.ageHours)+'. '+(V.lastError?'Last error: '+esc(V.lastError):'The scheduled refresh has not run recently.')+'</div>';
+  else if(V.lastError)b+='<div class="banner warn"><strong>Some data could not be refreshed.</strong> '+esc(V.lastError)+'</div>';
+  document.getElementById('banners').innerHTML=b;
+  var s=V.summary;
+  document.getElementById('summary').innerHTML=[['Products',s.products,''],['Active projects',s.active,''],['Overdue projects',s.overdue,s.overdue?'bad':''],['Avg. completion',s.avg===null?'—':Math.round(s.avg)+'%','']]
+    .map(function(x){return '<div><dt>'+x[0]+'</dt><dd class="'+x[2]+'">'+x[1]+'</dd></div>';}).join('');
+
+  var nAttn=V.products.reduce(function(n,p){return n+p.projects.filter(needs).length;},0);
+  document.querySelector('.seg button[data-f="attn"]').textContent='Needs attention ('+nAttn+')';
+  document.getElementById('hint').hidden=filter!=='attn';
+  var open={};[].forEach.call(document.querySelectorAll('details.product[open]'),function(e){open[e.dataset.n]=1;});
+  var html='';
+  V.products.forEach(function(pr,i){
+    var list=filter==='attn'?pr.projects.filter(needs):pr.projects;
+    if(!list.length)return;
+    var cnt=function(t){return pr.projects.filter(function(p){return p.status===t;}).length;};
+    var bits=['<span>'+pr.projects.length+' project'+(pr.projects.length===1?'':'s')+'</span>'];
+    if(cnt('Overdue'))bits.push('<span style="color:var(--bad)">'+cnt('Overdue')+' overdue</span>');
+    if(cnt('At Risk'))bits.push('<span style="color:var(--warn)">'+cnt('At Risk')+' at risk</span>');
+    if(pr.stale)bits.push('<span style="color:var(--warn)">showing last good data</span>');
+    var isOpen=filter==='attn'?true:(firstRender?i===0:!!open[pr.name]);
+    html+='<details class="product" data-n="'+esc(pr.name)+'"'+(isOpen?' open':'')+'><summary><span class="chev" aria-hidden="true"></span>'+
+      '<span class="pname">'+esc(pr.name)+'</span>'+
+      '<span class="pright"><span class="mini" aria-hidden="true"><i style="width:'+(pr.avg===null?0:Math.round(pr.avg))+'%"></i></span><span class="pavg">'+(pr.avg===null?'—':Math.round(pr.avg)+'%')+'</span></span>'+
+      '<span class="psub">'+bits.join('')+'</span></summary><ul class="projects">'+list.map(projectRow).join('')+'</ul></details>';
+  });
+  document.getElementById('products').innerHTML=html||'<div class="empty">'+(V.products.length?'Nothing needs attention: every project is On Track.':(V.admin.errors&&V.admin.errors.length?'No product could be read. See the warning above and the admin notes below.':'No Google Sheets found in the source folder.'))+'</div>';
+  firstRender=false;syncToggle();
+
+  var a=V.admin,sect=function(t,arr){return '<div><h3>'+t+'</h3>'+(arr&&arr.length?'<ul>'+arr.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'<span>None.</span>')+'</div>';};
+  var tabs=V.products.reduce(function(n,p){return n+p.projects.length;},0);
+  document.getElementById('adminBody').innerHTML=
+    '<div>'+V.products.length+' products · '+tabs+' projects parsed · '+a.skipped.length+' tab/file(s) skipped. Refreshed '+fmtTime(V.generatedAt)+'.</div>'+
+    sect('Read errors (last good data shown)',a.errors)+sect('Projects read in this refresh',a.read)+sect('Tabs / files skipped or not parsed',a.skipped)+sect('Missing columns',a.missing)+
+    sect('Assumptions made',(a.assume||[]).concat([
+      'Task completion = Dev % x '+Math.round(V.devShare*100)+'% + QA % x '+Math.round((1-V.devShare)*100)+'% (or the Dev/QA effort columns when present). Tasks with no QA status are scored on Dev only.',
+      'Status mapping: Done = 100%, Not Started = 0%, In Progress / Code Review = the % entered. In Dev Status, "QA Ready" = Dev 100%. "On Hold", Cancelled, Deferred and N/A are left out of progress.',
+      'Project completion is weighted by Weight / Efforts when every counted task has one, otherwise equal-weighted. Cancelled, Deferred and N/A are excluded.',
+      'Overdue = ETA before today and under 100%. At Risk = ETA within 14 days and under 80%, or an open task already past its end date. ETA = latest end date among incomplete tasks.']))+
+    sect('ETA issues',a.eta);
+}
+
+function syncToggle(){var ds=[].slice.call(document.querySelectorAll('details.product'));document.getElementById('toggleAll').textContent=ds.length&&ds.every(function(x){return x.open;})?'Collapse all':'Expand all';}
+function fail(msg){document.getElementById('banners').innerHTML='<div class="banner bad"><strong>Live data unavailable.</strong> '+esc(msg)+' Figures are not shown rather than showing stale or guessed numbers.</div>';if(!V)document.getElementById('products').innerHTML='<div class="empty">No data to display.</div>';}
+var API_URL = 'https://script.google.com/macros/s/AKfycbylL_g1ffIHol-kxrrWp5od1uAnZKanwfqxn46J0clhoSIz145OmBG5Jk5bnfVc3QJYTQ/exec'; // Apps Script Web app URL (ends in /exec)
+function call(action){
+  if(API_URL.indexOf('https://script.google.com/')!==0) return Promise.reject(new Error('API_URL is not set in this page.'));
+  var u=API_URL+'?format=json'+(action==='refresh'?'&action=refresh':'')+'&t='+Date.now();
+  return fetch(u,{redirect:'follow',credentials:'omit'}).then(function(r){
+    if(!r.ok) throw new Error('The data service answered HTTP '+r.status+'.');
+    return r.json();
+  });
+}
+function load(fnName){
+  var btn=document.getElementById('refresh');btn.disabled=true;btn.textContent='Refreshing…';
+  call(fnName==='refreshNow'?'refresh':'data').then(function(d){
+    btn.disabled=false;btn.textContent='Refresh now';
+    if(d.error){fail(d.error);return;}
+    V=d;render();
+    var n=document.getElementById('rnote');
+    if(fnName==='refreshNow'){n.textContent=d.refreshSkipped?'Already up to date (refreshed '+ago(d.ageHours)+'). Try again in '+d.retryInSec+' s.':'Refreshed just now.';setTimeout(function(){n.textContent='';},8000);}
+  }).catch(function(e){
+    btn.disabled=false;btn.textContent='Refresh now';
+    fail(e&&e.message?e.message:'The data service did not respond.');
+  });
+}
+document.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){filter=b.dataset.f;document.querySelectorAll('.seg button').forEach(function(x){x.setAttribute('aria-pressed',x===b);});if(V)render();});});
+document.getElementById('toggleAll').addEventListener('click',function(){var ds=[].slice.call(document.querySelectorAll('details.product')),all=ds.every(function(x){return x.open;});ds.forEach(function(x){x.open=!all;});syncToggle();});
+document.getElementById('products').addEventListener('toggle',syncToggle,true);
+document.getElementById('refresh').addEventListener('click',function(){load('refreshNow');});
+load('getDashboardData');
+setInterval(function(){load('getDashboardData');},10*60*1000); // keep an open tab current
+</script>
+</body>
+</html>
